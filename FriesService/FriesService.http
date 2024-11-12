@@ -1,0 +1,6 @@
+@FriesService_HostAddress = http://localhost:5037
+
+GET {{FriesService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

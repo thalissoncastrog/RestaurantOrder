@@ -1,0 +1,6 @@
+@DesertService_HostAddress = http://localhost:5208
+
+GET {{DesertService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

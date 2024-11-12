@@ -1,0 +1,183 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: "rabbitmq"
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmqadmin
+      RABBITMQ_DEFAULT_PASS: rabbitmqadmin@123456
+      RABBITMQ_ERLANG_COOKIE: secret_cookie
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq/mnesia
+      - rabbitmq_logs:/var/log/rabbitmq
+    networks:
+      - app-network
+
+  apigateway:
+    image: api-gateway:latest
+    build:
+      context: ./ApiGateway
+      dockerfile: Dockerfile
+    container_name: "apigateway"
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      JWT_ISSUER: "apigateway"
+      JWT_AUDIENCE: "my-microservices"
+      JWT_SECRET_KEY: "X2!7sk3@9qS8m7fH2&gP5dR0zB!k2oR3dWnL6mQp1sNx4v"
+    networks:
+      - app-network
+    depends_on:
+      - rabbitmq
+      - orderservice
+      - authservice
+
+  orderservice:
+    image: order-service:latest
+    build:
+      context: ./OrderService
+      dockerfile: Dockerfile
+    container_name: "orderservice"
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: rabbitmqadmin
+      RABBITMQ_PASSWORD: rabbitmqadmin@123456
+      JWT_ISSUER: "apigateway"
+      JWT_AUDIENCE: "my-microservices"
+      JWT_SECRET_KEY: "X2!7sk3@9qS8m7fH2&gP5dR0zB!k2oR3dWnL6mQp1sNx4v"
+    networks:
+      - app-network
+    depends_on:
+      - rabbitmq
+
+  authservice:
+    image: auth-service:latest
+    build:
+      context: ./AuthService
+      dockerfile: Dockerfile
+    container_name: "authservice"
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      JWT_ISSUER: "apigateway"
+      JWT_AUDIENCE: "my-microservices"
+      JWT_SECRET_KEY: "X2!7sk3@9qS8m7fH2&gP5dR0zB!k2oR3dWnL6mQp1sNx4v"
+    networks:
+      - app-network
+
+  friesservice:
+    image: fries-service:latest
+    build:
+      context: ./FriesService
+      dockerfile: Dockerfile
+    container_name: "friesservice"
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: rabbitmqadmin
+      RABBITMQ_PASSWORD: rabbitmqadmin@123456
+      JWT_ISSUER: "apigateway"
+      JWT_AUDIENCE: "my-microservices"
+      JWT_SECRET_KEY: "X2!7sk3@9qS8m7fH2&gP5dR0zB!k2oR3dWnL6mQp1sNx4v"
+    networks:
+      - app-network
+    depends_on:
+      - rabbitmq
+
+  grillservice:
+    image: grill-service:latest
+    build:
+      context: ./GrillService
+      dockerfile: Dockerfile
+    container_name: "grillservice"
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: rabbitmqadmin
+      RABBITMQ_PASSWORD: rabbitmqadmin@123456
+      JWT_ISSUER: "apigateway"
+      JWT_AUDIENCE: "my-microservices"
+      JWT_SECRET_KEY: "X2!7sk3@9qS8m7fH2&gP5dR0zB!k2oR3dWnL6mQp1sNx4v"
+    networks:
+      - app-network
+    depends_on:
+      - rabbitmq
+
+  saladservice:
+    image: salad-service:latest
+    build:
+      context: ./SaladService
+      dockerfile: Dockerfile
+    container_name: "saladservice"
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: rabbitmqadmin
+      RABBITMQ_PASSWORD: rabbitmqadmin@123456
+      JWT_ISSUER: "apigateway"
+      JWT_AUDIENCE: "my-microservices"
+      JWT_SECRET_KEY: "X2!7sk3@9qS8m7fH2&gP5dR0zB!k2oR3dWnL6mQp1sNx4v"
+    networks:
+      - app-network
+    depends_on:
+      - rabbitmq
+
+  drinkservice:
+    image: drink-service:latest
+    build:
+      context: ./DrinkService
+      dockerfile: Dockerfile
+    container_name: "drinkservice"
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: rabbitmqadmin
+      RABBITMQ_PASSWORD: rabbitmqadmin@123456
+      JWT_ISSUER: "apigateway"
+      JWT_AUDIENCE: "my-microservices"
+      JWT_SECRET_KEY: "X2!7sk3@9qS8m7fH2&gP5dR0zB!k2oR3dWnL6mQp1sNx4v"
+    networks:
+      - app-network
+    depends_on:
+      - rabbitmq
+
+  desertservice:
+    image: desert-service:latest
+    build:
+      context: ./DesertService
+      dockerfile: Dockerfile
+    container_name: "desertservice"
+    restart: always
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USER: rabbitmqadmin
+      RABBITMQ_PASSWORD: rabbitmqadmin@123456
+      JWT_ISSUER: "apigateway"
+      JWT_AUDIENCE: "my-microservices"
+      JWT_SECRET_KEY: "X2!7sk3@9qS8m7fH2&gP5dR0zB!k2oR3dWnL6mQp1sNx4v"
+    networks:
+      - app-network
+    depends_on:
+      - rabbitmq
+
+volumes:
+  rabbitmq_data:
+    driver: local
+  rabbitmq_logs:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
